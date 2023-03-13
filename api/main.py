@@ -56,6 +56,16 @@ def get_stations():
     stations = StationInformation.get_stations(engine, limit, offset)
     return stations
 
+@app.route('/stations/<station_id>/status', methods = ['GET'])
+def get_station(station_id):
+    station_status = StationStatus.get_station_status(engine, station_id)
+
+    if station_status is None:
+        return "Station not found"
+    
+    return station_status
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8001))

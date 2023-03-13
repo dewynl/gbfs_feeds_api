@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, JSON, Boolean, UUID
+from sqlalchemy import Column, Integer, String, JSON, Boolean, UUID, MetaData, Table, select
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.dialects.postgresql import insert
 import uuid
@@ -32,3 +32,21 @@ class StationStatus(Base):
         })
         proxy =  session.execute(stmt)
         return proxy
+    
+    @classmethod
+    def get_station_status(cls, db_engine, id):
+        connection = db_engine.connect()
+        metadata = MetaData()
+        stations_status_table = Table(cls.__tablename__, metadata, autoload_replace=True, autoload_with=db_engine)
+
+        query = select(stations_status_table.c.is_returning, 
+                       stations_status_table.c.is_renting, 
+                       stations_status_table.c.is_installed,
+                       stations_status_table.c.num_docks_available,
+                       stations_status_table.c.num_bikes_available,
+                       stations_status_table.c.last_reported
+                    ).where(stations_status_table.c.station_id == id)
+        
+        result = connection.execute(query).fetchone()
+        result = result._asdict() if result else None
+        return result
