@@ -1,4 +1,4 @@
-import os, json
+import os, json, time
 import urllib.request
 from flask import Flask, request
 from sqlalchemy import create_engine
@@ -69,6 +69,10 @@ def get_station(station_id):
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8001))
+
+    # a little sleeping to give time to make sure the db is up by the time the compose runs this. 
+    # here until I can figure out a better way to do it in the compose file.
+    time.sleep(5) 
     try:
         engine = create_engine(DB_URI, connect_args={"application_name":"gbfs_api"})
         create_tables(engine)
