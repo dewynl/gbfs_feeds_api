@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, JSON, String, UUID
+from sqlalchemy import Column, Integer, JSON, String, UUID, MetaData, Table
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.dialects.postgresql import insert
 import uuid
@@ -31,3 +31,18 @@ class StationInformation(Base):
         })
         session.execute(stmt)
         return True
+    
+    @classmethod
+    def get_stations(cls, db_engine, limit, offset):
+        connection = db_engine.connect()
+        metadata = MetaData()
+
+        stations_table = Table(cls.__tablename__, metadata, autoload_replace=True, autoload_with=db_engine)
+        query = stations_table.select().limit(limit=limit).offset(offset)
+
+        proxy = connection.execute(query)
+        rows = proxy.fetchall()
+
+        # row -> dict
+        results = [r._asdict() for r in rows]
+        return results

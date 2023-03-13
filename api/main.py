@@ -49,6 +49,14 @@ def ingest():
     return data
 
 
+@app.route('/stations', methods = ['GET'])
+def get_stations():
+    limit = request.args.get('limit', 100)
+    offset = request.args.get('offset', 0)
+    stations = StationInformation.get_stations(engine, limit, offset)
+    return stations
+
+
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8001))
     try:
