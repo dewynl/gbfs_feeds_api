@@ -1,0 +1,16 @@
+version: "3.2"
+
+services:
+    db_node:
+        container_name: db_node
+        image: cockroachdb/cockroach:latest
+        volumes:
+            - ./data/db_node:/cockroach/cockroach-data
+        command: start-single-node --insecure
+        ports:
+            - "26257:26257"
+            - "8080:8080"
+
+networks:
+    default:
+        driver: bridge
